@@ -19,32 +19,38 @@ from core import logger
 
 
 def baidu_repetition_rate(article: Article):
-    sentences = summarize(article)
-    totalScore = 0
-    sen_num = 0
-    for sen in sentences:
-        try:
-            search_key = str(sen)
-            page = search_baidu(search_key)
-            soup = BeautifulSoup(page)
-            score = 0
-            num = 0
-            for item in soup.find_all('div', class_='c-container'):
-                try:
-                    score += rank_item(article, search_key, item)
-                    num += 1
-                except Exception as e:
-                    logger.info(e)
-                    continue
-            if num > 0:
-                sen_num += 1
-                totalScore += score / num
-        except Exception as e:
-            logger.error(e)
-            continue
-    article.score = totalScore / sen_num
-    logger.debug('================================')
-    logger.debug("[%s]得分：%f" % (article.title, article.score))
+    try:
+        sentences = summarize(article)
+        totalScore = 0
+        sen_num = 0
+        for sen in sentences:
+            try:
+                search_key = str(sen)
+                page = search_baidu(search_key)
+                soup = BeautifulSoup(page)
+                score = 0
+                num = 0
+                for item in soup.find_all('div', class_='c-container'):
+                    try:
+                        score += rank_item(article, search_key, item)
+                        num += 1
+                    except Exception as e:
+                        logger.info(e)
+                        continue
+                if num > 0:
+                    sen_num += 1
+                    totalScore += score / num
+            except Exception as e:
+                logger.error(e)
+                continue
+        finial_score = totalScore / sen_num
+        logger.debug('================================')
+        logger.debug("[%s]得分：%f" % (article.title, finial_score))
+        return finial_score
+    except Exception as e:
+        logger.error('[%s]摘要错误' % article.title)
+        logger.error(e)
+        return 0
 
 
 def search_baidu(key):

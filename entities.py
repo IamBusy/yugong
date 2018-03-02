@@ -38,5 +38,28 @@ class Article:
     def score(self, score):
         self._score = score
 
+    def __cmp__(self, other):
+        if self.__eq__(other):
+            return 0
+        elif self.__lt__(other):
+            return -1
+        elif self.__gt__(other):
+            return 1
+
+    def __eq__(self, other):
+        if not isinstance(other, Article):
+            raise TypeError("can't cmp other type to Article!")
+        return self.score == other.score
+
+    def __lt__(self, other):
+        if not isinstance(other, Article):
+            raise TypeError("can't cmp other type to Article!")
+        return self.score < other.score
+
+    def __gt__(self, other):
+        if not isinstance(other, Article):
+            raise TypeError("can't cmp other type to Article!")
+        return self.score > other.score
+
 
 

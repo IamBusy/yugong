@@ -10,6 +10,14 @@
 @time: 01/03/2018 22:02
 """
 
+from entities import Article
+from filter import baidu_repetition_rate
+
 class Analytizer:
+
     def __init__(self):
         pass
+
+    def estimate(self, article: Article):
+        article.score = baidu_repetition_rate(article)
+
