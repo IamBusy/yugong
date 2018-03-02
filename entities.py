@@ -16,15 +16,27 @@ class Article:
         self._title = title
         self._content = content
         self._html = html
+        self._score = 0
 
-    def get_title(self):
+    @property
+    def title(self):
         return self._title
 
-    def get_content(self):
+    @property
+    def content(self):
         return self._content
 
-    def get_html(self):
+    @property
+    def html(self):
         return self._html
+
+    @property
+    def score(self):
+        return self._score
+
+    @score.setter
+    def score(self, score):
+        self._score = score
 
 
 
