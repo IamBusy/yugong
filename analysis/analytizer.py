@@ -13,6 +13,7 @@
 from entities import Article
 from filter import baidu_repetition_rate
 from summarizer import summarize
+from core import logger
 
 class Analytizer:
 
@@ -20,6 +21,8 @@ class Analytizer:
         pass
 
     def estimate(self, article: Article):
-        article.summarize = summarize(article)
-        article.score = baidu_repetition_rate(article)
-
+        try:
+            article.summarize = summarize(article)
+            article.score = baidu_repetition_rate(article)
+        except Exception as e:
+            logger.error('Estimate article error: [%s]' % article.title)

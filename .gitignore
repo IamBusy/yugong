@@ -101,3 +101,5 @@ ENV/
 .mypy_cache/
 
 .idea
+
+.qiniu_pythonsdk_hostscache.json

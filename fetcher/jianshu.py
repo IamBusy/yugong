@@ -31,6 +31,9 @@ class Jianshu:
         article = soup.find('div', class_='article')
         title = article.h1.string
         content = article.find('div', class_='show-content')
+        for img in content.find_all('img'):
+            if 'data-original-src' in img.attrs:
+                img['src'] = 'http:' + img['data-original-src']
         return Article(title, content.get_text(), str(content))
 
     def fetch_from_seminar(self):

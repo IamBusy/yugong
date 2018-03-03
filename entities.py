@@ -23,6 +23,10 @@ class Article:
     def title(self):
         return self._title
 
+    @title.setter
+    def title(self, title):
+        self._title = title
+
     @property
     def content(self):
         return self._content
@@ -30,6 +34,10 @@ class Article:
     @property
     def html(self):
         return self._html
+
+    @html.setter
+    def html(self, html):
+        self._html = html
 
     @property
     def score(self):

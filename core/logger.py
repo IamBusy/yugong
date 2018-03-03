@@ -27,9 +27,9 @@ def __get_log_file():
     log_type = config.get('app.log.type')
     if log_type == 'daily':
         return os.path.join(config.APP_PATH,
-                            "storage/logs/ad-delivery-%s.log" % time.strftime('%Y-%m-%d', time.localtime()))
+                            "storage/logs/" + config.get('app.name') + "-%s.log" % time.strftime('%Y-%m-%d', time.localtime()))
     else:
-        return os.path.join(config.APP_PATH, 'storage/logs/ad-delivery.log')
+        return os.path.join(config.APP_PATH, 'storage/logs/' + config.get('app.name') + '.log')
 
 
 def __init():
