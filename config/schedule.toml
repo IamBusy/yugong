@@ -1,3 +1,0 @@
-[db.mongo]
-host="localhost"
-db="schedule"

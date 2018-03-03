@@ -1,0 +1,11 @@
+[jianshu]
+
+# 专题名称， 访问：https://www.jianshu.com/c/[seminar]
+seminars = [
+    "f63dac4d430e", # JavaScript 进阶营
+    "86ff829f995f", # 大数据，机器学习，人工智能
+    "f489ec955505", # Web前端之路
+    "9ca077f0fae8", # 机器学习与数据挖掘
+]
+
+limit = 10

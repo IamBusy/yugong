@@ -1,0 +1,33 @@
+
+# project name
+name="yugong"
+
+
+[celery]
+broker="redis://localhost:6379/0"
+backend="redis://localhost:6379/1"
+
+[log]
+# Available settings: single/daily
+type="single"
+
+# Available settings: debug/info/notice/warning/error/critical
+level="debug"
+
+# Available settings: file/stdout/stderr
+#driver="stderr"
+driver = "file"
+
+
+
+[toutiao]
+access_token="token"
+client_key = "key"
+client_secret="secret"
+
+[qiniu]
+access_key="key"
+secret_key="key"
+bucket="toutiao"
+#domain="http://cdn-td.xiaolewei.com/"
+domain="domain"
