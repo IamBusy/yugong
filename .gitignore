@@ -103,3 +103,5 @@ ENV/
 .idea
 
 .qiniu_pythonsdk_hostscache.json
+config/app.toml
+config/fetcher.toml
