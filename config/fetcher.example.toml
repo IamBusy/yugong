@@ -9,3 +9,5 @@ seminars = [
 ]
 
 limit = 10
+
+up_to_last_time=false

@@ -21,10 +21,12 @@ class Jianshu:
     _seminar_url = 'https://www.jianshu.com/c/'
     _jianshu = 'https://www.jianshu.com'
     _cache_seminar_key = 'fetcher-jianshu-seminar-%s-last-time'
+    _up_to_last_time = False
 
     def __init__(self):
         self._seminars = config.get('fetcher.jianshu.seminars')
         self._limit = config.get('fetcher.jianshu.limit')
+        self._up_to_last_time = config.get('fetcher.jianshu.up_to_last_time')
         pass
 
     def fetch_article_from_url(self, url):
@@ -62,7 +64,7 @@ class Jianshu:
                     # Judge shared time to avoid repeated fetching
                     time_span = li.find('span', class_='time')
                     shared_time = time_span['data-shared-at']
-                    if time.mktime(time.strptime(shared_time, '%Y-%m-%dT%H:%M:%S+08:00')) <= last_fetch_time:
+                    if self._up_to_last_time and time.mktime(time.strptime(shared_time, '%Y-%m-%dT%H:%M:%S+08:00')) <= last_fetch_time:
                         logger.info('Jianshu fetch article(time:%s) up to last time(%s)' % (shared_time, last_fetch_time))
                         break
                     if num > self._limit:
