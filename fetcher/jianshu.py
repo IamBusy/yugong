@@ -10,15 +10,17 @@
 @time: 01/03/2018 20:44
 """
 
+import time
 import requests
 from bs4 import BeautifulSoup
-from core import config
+from core import config, cache, logger
 from entities import Article
 
 
 class Jianshu:
     _seminar_url = 'https://www.jianshu.com/c/'
     _jianshu = 'https://www.jianshu.com'
+    _cache_seminar_key = 'fetcher-jianshu-seminar-%s-last-time'
 
     def __init__(self):
         self._seminars = config.get('fetcher.jianshu.seminars')
@@ -39,14 +41,30 @@ class Jianshu:
     def fetch_from_seminar(self):
         res = []
         for seminar in self._seminars:
+
+            last_fetch_time = cache.get(self._cache_seminar_key % seminar)
+            if not last_fetch_time:
+                last_fetch_time = 0
+            logger.info('Jianshu last fetch [%s] time: %s' % (seminar, last_fetch_time))
+            if config.get('app.debug'):
+                cache.put(self._cache_seminar_key % seminar, time.time())
+
             resp = requests.get(self._seminar_url + seminar)
             if resp.status_code / 100 != 2:
                 continue
             soup = BeautifulSoup(resp.text)
+
             ul = soup.find('ul', class_='note-list')
             num = 0
+
             for li in ul.find_all('li'):
                 try:
+                    # Judge shared time to avoid repeated fetching
+                    time_span = li.find('span', class_='time')
+                    shared_time = time_span['data-shared-at']
+                    if time.mktime(time.strptime(shared_time, '%Y-%m-%dT%H:%M:%S+08:00')) <= last_fetch_time:
+                        logger.info('Jianshu fetch article(time:%s) up to last time(%s)' % (shared_time, last_fetch_time))
+                        break
                     if num > self._limit:
                         break
                     a = li.find('a', class_='title')

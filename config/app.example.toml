@@ -1,6 +1,6 @@
-
 # project name
 name="yugong"
+debug=true
 
 
 [celery]

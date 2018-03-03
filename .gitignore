@@ -105,3 +105,4 @@ ENV/
 .qiniu_pythonsdk_hostscache.json
 config/app.toml
 config/fetcher.toml
+storage
