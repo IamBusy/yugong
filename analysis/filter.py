@@ -11,16 +11,14 @@
 """
 
 import requests
-from urllib import parse
 from bs4 import BeautifulSoup
-from summarizer import summarize
 from entities import Article
 from core import logger
 
 
 def baidu_repetition_rate(article: Article):
     try:
-        sentences = summarize(article)
+        sentences = article.summarize
         totalScore = 0
         sen_num = 0
         for sen in sentences:

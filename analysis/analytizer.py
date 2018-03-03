@@ -12,6 +12,7 @@
 
 from entities import Article
 from filter import baidu_repetition_rate
+from summarizer import summarize
 
 class Analytizer:
 
@@ -19,5 +20,6 @@ class Analytizer:
         pass
 
     def estimate(self, article: Article):
+        article.summarize = summarize(article)
         article.score = baidu_repetition_rate(article)
 

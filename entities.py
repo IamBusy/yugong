@@ -17,6 +17,7 @@ class Article:
         self._content = content
         self._html = html
         self._score = 0
+        self._summarize = ''
 
     @property
     def title(self):
@@ -37,6 +38,14 @@ class Article:
     @score.setter
     def score(self, score):
         self._score = score
+
+    @property
+    def summarize(self):
+        return self._summarize
+
+    @summarize.setter
+    def summarize(self, summarize):
+        self._summarize = summarize
 
     def __cmp__(self, other):
         if self.__eq__(other):
