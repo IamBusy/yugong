@@ -13,7 +13,7 @@ import sys
 import config
 import os
 import time
-from logbook import Logger, StreamHandler, FileHandler
+from logbook import Logger, StreamHandler, FileHandler, set_datetime_format
 import container
 import functools
 
@@ -45,6 +45,7 @@ def __init():
         __handler = FileHandler(filename=__get_log_file(), level=level)
     else:
         raise Exception('Invalid driver for log')
+    set_datetime_format(config.get('app.log.datetime_format'))
     __handler.push_application()
     __loggers['core'] = Logger('Core')
     container.register('logger', __loggers['core'])
