@@ -64,8 +64,8 @@ class Toutiao:
 
         # append summarize
         summ = ''
-        if article.summarize:
-            summ = '<blockquote><p></p></blockquote>' % article.summarize
+        if article.abstract_str:
+            summ = '<h1>内容导读</h1><blockquote><p>%s</p></blockquote>' % str(article.abstract_str)
         article.html = summ + str(soup)
 
     def publish(self, article):
@@ -88,4 +88,6 @@ class Toutiao:
                 logger.error(article.html)
 
         except Exception as e:
+            logger.error('Toutiao publish [%s] error' % article.title)
+            logger.error(e)
             pass

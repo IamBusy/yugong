@@ -18,7 +18,7 @@ from sumy.utils import get_stop_words
 from entities import Article
 
 LANGUAGE = 'chinese'
-SENTENCES_COUNT = 10
+SENTENCES_COUNT = 6
 
 
 def summarize(article: Article):

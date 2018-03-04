@@ -22,7 +22,9 @@ class Analytizer:
 
     def estimate(self, article: Article):
         try:
-            article.summarize = summarize(article)
+            article.summary = summarize(article)
+            for sen in article.summary:
+                article.abstract_str += str(sen)
             article.score = baidu_repetition_rate(article)
         except Exception as e:
             logger.error('Estimate article error: [%s]' % article.title)

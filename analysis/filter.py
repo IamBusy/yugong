@@ -18,7 +18,7 @@ from core import logger
 
 def baidu_repetition_rate(article: Article):
     try:
-        sentences = article.summarize
+        sentences = article.summary
         totalScore = 0
         sen_num = 0
         for sen in sentences:
