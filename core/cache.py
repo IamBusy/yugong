@@ -9,16 +9,14 @@
 @file: cache.py
 @time: 03/03/2018 23:30
 """
-import redis
+import db
 import config
 
 
 _enable = config.get('app.cache.enable')
 _client = None
 if _enable:
-    _client = redis.Redis(host=config.get('app.cache.host'),
-                          port=config.get('app.cache.port'),
-                          db=config.get('app.cache.db'))
+    _client = db.get_redis_client(config.get('app.redis'))
 
 
 def _check_enable():
@@ -32,5 +30,6 @@ def put(key, value, ttl=None):
 
 
 def get(key):
+    _check_enable()
     return _client.get(key)
 

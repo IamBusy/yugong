@@ -13,7 +13,7 @@
 import time
 import requests
 from bs4 import BeautifulSoup
-from core import config, cache, logger
+from core import config, cache, logger, db
 from entities import Article
 
 
@@ -27,7 +27,7 @@ class Jianshu:
         self._seminars = config.get('fetcher.jianshu.seminars')
         self._limit = config.get('fetcher.jianshu.limit')
         self._up_to_last_time = config.get('fetcher.jianshu.up_to_last_time')
-        pass
+        self._set_manager = db.get_redis_client(config.get('app.redis'))
 
     def fetch_article_from_url(self, url):
         resp = requests.get(url)
@@ -43,7 +43,9 @@ class Jianshu:
     def fetch_from_seminar(self):
         res = []
         for seminar in self._seminars:
-
+            set_key = 'last_fetched_article_by_seminar_' + seminar
+            last_fetched_articles = self._set_manager.smembers(set_key)
+            this_fetched_articles = []
             last_fetch_time = cache.get(self._cache_seminar_key % seminar)
             if not last_fetch_time:
                 last_fetch_time = 0
@@ -54,6 +56,7 @@ class Jianshu:
             resp = requests.get(self._seminar_url + seminar)
             if resp.status_code / 100 != 2:
                 continue
+            logger.debug('Seminar [%s] content: \n %s' % (seminar, resp.text))
             soup = BeautifulSoup(resp.text)
 
             ul = soup.find('ul', class_='note-list')
@@ -73,10 +76,19 @@ class Jianshu:
                     href = a['href']
                     article = self.fetch_article_from_url(self._jianshu + href)
                     if article:
+                        if article.title in last_fetched_articles:
+                            break
                         res.append(article)
+                        this_fetched_articles.append(article.title)
                         num += 1
                 except Exception as e:
                     continue
+            num = len(last_fetched_articles)
+            while num > 0:
+                self._set_manager.spop(set_key)
+                num -= 1
+            for article in this_fetched_articles:
+                self._set_manager.sadd(set_key, article.title)
         return res
 
     def fetch(self):

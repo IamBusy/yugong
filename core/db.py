@@ -12,6 +12,7 @@
 
 from orator import DatabaseManager
 from pymongo import MongoClient
+import redis
 
 # TODO Reuse connections
 __clients = {}
@@ -36,3 +37,9 @@ def get_mongo_client(config):
                        host=config['host'],
                        port=config['port'])
     return conn.config['db']
+
+
+def get_redis_client(config):
+    return redis.Redis(host=config['host'],
+                       port=config['port'],
+                       db=config['db'])

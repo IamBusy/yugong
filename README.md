@@ -8,4 +8,8 @@ I'm not writer, but the mover of article
 `fetcher` fetches latest articles from different sources, and `analytizer`
 takes responsibility to rank them, the top K articles will be published by `publisher` 
 
+# TODO
+1. Separate fetcher and  publisher by queue
+1. Record articles published in one months
+1. Build docker image
 
