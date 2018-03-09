@@ -46,6 +46,8 @@ class Jianshu:
             set_key = 'last_fetched_article_by_seminar_' + seminar
             last_fetched_articles = self._set_manager.smembers(set_key)
             this_fetched_articles = []
+            for s in last_fetched_articles:
+                print(s)
             last_fetch_time = cache.get(self._cache_seminar_key % seminar)
             if not last_fetch_time:
                 last_fetch_time = 0
@@ -76,19 +78,24 @@ class Jianshu:
                     href = a['href']
                     article = self.fetch_article_from_url(self._jianshu + href)
                     if article:
-                        if article.title in last_fetched_articles:
+                        title = repr(article.title)
+                        if title in last_fetched_articles:
                             break
                         res.append(article)
-                        this_fetched_articles.append(article.title)
+                        this_fetched_articles.append(title)
                         num += 1
                 except Exception as e:
+                    print(e)
                     continue
+
+            # clear last fetched articles
             num = len(last_fetched_articles)
             while num > 0:
                 self._set_manager.spop(set_key)
                 num -= 1
             for article in this_fetched_articles:
-                self._set_manager.sadd(set_key, article.title)
+                title = repr(article.title)
+                self._set_manager.sadd(set_key, title)
         return res
 
     def fetch(self):
