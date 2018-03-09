@@ -12,7 +12,7 @@
 
 
 class Article:
-    def __init__(self, title, content, html, **kwargs):
+    def __init__(self, title='', content='', html='', **kwargs):
         self._title = title
         self._content = content
         self._html = html
@@ -86,6 +86,9 @@ class Article:
         if not isinstance(other, Article):
             raise TypeError("can't cmp other type to Article!")
         return self.score > other.score
+
+    def rebuild(self, dict):
+        self.__dict__.update(dict)
 
 
 

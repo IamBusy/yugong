@@ -9,15 +9,20 @@
 @file: fetch.py
 @time: 07/03/2018 00:09
 """
+import pickle
+import json
 from fetcher import jianshu
-from core import db, config
+from core import db, config, logger
 from analysis.analytizer import Analytizer
+from entities import Article
 
 
 if __name__ == '__main__':
     fetchers = [jianshu.Jianshu()]
     analytizer = Analytizer()
     client = db.get_redis_client(config.get('app.redis'))
+    # article = Article('title', 'content', 'html')
+    # client.rpush('fetched_article', pickle.dumps(article))
 
     articles = []
     for f in fetchers:
@@ -26,4 +31,7 @@ if __name__ == '__main__':
             articles.append(article)
     articles = sorted(articles, reverse=True)
     for article in articles:
-        client.rpush('fetched_article', article)
+        article.summary = None
+        article_str = json.dumps(article, default=lambda obj: obj.__dict__)
+        logger.debug(article_str)
+        client.rpush('fetched_article', article_str)

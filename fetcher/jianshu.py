@@ -27,6 +27,7 @@ class Jianshu:
         self._seminars = config.get('fetcher.jianshu.seminars')
         self._limit = config.get('fetcher.jianshu.limit')
         self._up_to_last_time = config.get('fetcher.jianshu.up_to_last_time')
+        self._debug = config.get('app.debug')
         self._set_manager = db.get_redis_client(config.get('app.redis'))
 
     def fetch_article_from_url(self, url):
@@ -46,13 +47,11 @@ class Jianshu:
             set_key = 'last_fetched_article_by_seminar_' + seminar
             last_fetched_articles = self._set_manager.smembers(set_key)
             this_fetched_articles = []
-            for s in last_fetched_articles:
-                print(s)
             last_fetch_time = cache.get(self._cache_seminar_key % seminar)
             if not last_fetch_time:
                 last_fetch_time = 0
             logger.info('Jianshu last fetch [%s] time: %s' % (seminar, last_fetch_time))
-            if config.get('app.debug'):
+            if self._debug:
                 cache.put(self._cache_seminar_key % seminar, time.time())
 
             resp = requests.get(self._seminar_url + seminar)
@@ -68,9 +67,9 @@ class Jianshu:
                 try:
                     # Judge shared time to avoid repeated fetching
                     time_span = li.find('span', class_='time')
-                    shared_time = time_span['data-shared-at']
-                    if self._up_to_last_time and time.mktime(time.strptime(shared_time, '%Y-%m-%dT%H:%M:%S+08:00')) <= last_fetch_time:
-                        logger.info('Jianshu fetch article(time:%s) up to last time(%s)' % (shared_time, last_fetch_time))
+                    write_time = time_span['data-shared-at']
+                    if (not self._debug) and time.mktime(time.strptime(write_time, '%Y-%m-%dT%H:%M:%S+08:00')) <= time.time() - 86400 * 10:
+                        logger.info('Jianshu fetch too old article(time:%s)' % (write_time))
                         break
                     if num > self._limit:
                         break
@@ -89,13 +88,14 @@ class Jianshu:
                     continue
 
             # clear last fetched articles
-            num = len(last_fetched_articles)
-            while num > 0:
-                self._set_manager.spop(set_key)
-                num -= 1
-            for article in this_fetched_articles:
-                title = repr(article.title)
-                self._set_manager.sadd(set_key, title)
+            if not self._debug:
+                num = len(last_fetched_articles)
+                while num > 0:
+                    self._set_manager.spop(set_key)
+                    num -= 1
+                for article in this_fetched_articles:
+                    title = repr(article.title)
+                    self._set_manager.sadd(set_key, title)
         return res
 
     def fetch(self):
