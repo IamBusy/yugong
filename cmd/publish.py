@@ -19,13 +19,13 @@ from entities import Article
 
 if __name__ == '__main__':
     client = db.get_redis_client(config.get('app.redis'))
-    publish_point = [6, 17, 23]
+    publish_point = [6, 17]
     publisher = Toutiao()
     published_key = 'published_articles'
     while True:
         try:
             t = time.localtime(time.time())
-            if True or t.tm_hour in publish_point:
+            if t.tm_hour in publish_point:
                 article_str = client.lpop('fetched_article')
                 while article_str and len(article_str) > 0:
                     try:
@@ -41,7 +41,8 @@ if __name__ == '__main__':
                     finally:
                         article_str = client.lpop('fetched_article')
                 time.sleep(3600)
-            time.sleep(600)
         except Exception as e:
             logger.error(e)
+        finally:
+            time.sleep(600)
 

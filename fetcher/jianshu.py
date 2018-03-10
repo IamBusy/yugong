@@ -57,7 +57,7 @@ class Jianshu:
             resp = requests.get(self._seminar_url + seminar)
             if resp.status_code / 100 != 2:
                 continue
-            logger.debug('Seminar [%s] content: \n %s' % (seminar, resp.text))
+            # logger.debug('Seminar [%s] content: \n %s' % (seminar, resp.text))
             soup = BeautifulSoup(resp.text)
 
             ul = soup.find('ul', class_='note-list')
