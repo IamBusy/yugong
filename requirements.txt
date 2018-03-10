@@ -1,0 +1,9 @@
+pymongo==3.6.0
+redis==2.10.6
+requests==2.18.4
+sumy==0.7.0
+qiniu==7.2.0
+toml==0.9.4
+Logbook==1.1.0
+orator==0.9.7
+beautifulsoup4==4.6.0

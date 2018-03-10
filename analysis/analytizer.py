@@ -11,9 +11,10 @@
 """
 
 from entities import Article
-from filter import baidu_repetition_rate
-from summarizer import summarize
+from analysis.filter import baidu_repetition_rate
+from analysis.summarizer import summarize
 from core import logger
+
 
 class Analytizer:
 

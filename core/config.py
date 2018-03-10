@@ -12,7 +12,7 @@
 
 import toml
 import os
-import container
+from core import container
 
 APP_PATH = os.path.split(os.path.split(os.path.realpath(__file__))[0])[0]
 
