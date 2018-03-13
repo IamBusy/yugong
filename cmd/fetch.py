@@ -34,7 +34,9 @@ if __name__ == '__main__':
             for article in articles:
                 article.summary = None
                 article_str = json.dumps(article, default=lambda obj: obj.__dict__)
-                client.rpush('fetched_article', article_str)
+                rtn = client.rpush('fetched_article', article_str)
+                if rtn:
+                    logger.info('Push [%s] to redis successfully')
             time.sleep(3600)
         except Exception as e:
             logger.error(e)
