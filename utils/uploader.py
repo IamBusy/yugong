@@ -13,6 +13,7 @@
 import time
 from qiniu import Auth, put_file, BucketManager
 from core import config, logger
+import random
 
 _q = Auth(config.get('app.qiniu.access_key'), config.get('app.qiniu.secret_key'))
 _bucket = config.get('app.qiniu.bucket')
@@ -21,7 +22,7 @@ _bucket_manager = BucketManager(_q)
 
 
 def upload(url: str):
-    key = 'yugong/' + str(int(time.time())) + '.jpg'
+    key = 'yugong/' + str(int(time.time())) + str(random.random()) + '.jpg'
     token = _q.upload_token(_bucket, key, 3600)
     try_time = 3
     while try_time >= 0:
