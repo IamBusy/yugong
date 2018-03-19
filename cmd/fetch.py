@@ -19,7 +19,7 @@ if __name__ == '__main__':
     fetchers = [jianshu.Jianshu()]
     analytizer = Analytizer()
     client = db.get_redis_client(config.get('app.redis'))
-    time_point = [6, 17]
+    time_point = [6, 20]
     while True:
         try:
             t = time.localtime(time.time())
@@ -36,7 +36,8 @@ if __name__ == '__main__':
                 article_str = json.dumps(article, default=lambda obj: obj.__dict__)
                 rtn = client.rpush('fetched_article', article_str)
                 if rtn:
-                    logger.info('Push [%s] to redis successfully')
+                    logger.info('Push [%s] to redis successfully' % repr(article.title))
+            logger.info('Starting sleep 3600s...')
             time.sleep(3600)
         except Exception as e:
             logger.error(e)

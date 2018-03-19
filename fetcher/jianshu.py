@@ -18,7 +18,7 @@ from entities import Article
 
 
 class Jianshu:
-    _seminar_url = 'https://www.jianshu.com/c/'
+    _seminar_url = 'https://www.jianshu.com/c/%s?order_by=added_at&page=%d'
     _jianshu = 'https://www.jianshu.com'
     _cache_seminar_key = 'fetcher-jianshu-seminar-%s-last-time'
     _up_to_last_time = False
@@ -47,45 +47,43 @@ class Jianshu:
             set_key = 'last_fetched_article_by_seminar_' + seminar
             last_fetched_articles = self._set_manager.smembers(set_key)
             this_fetched_articles = []
-            last_fetch_time = cache.get(self._cache_seminar_key % seminar)
-            if not last_fetch_time:
-                last_fetch_time = 0
-            logger.info('Jianshu last fetch [%s] time: %s' % (seminar, last_fetch_time))
-            if self._debug:
-                cache.put(self._cache_seminar_key % seminar, time.time())
+            logger.info('Jianshu last fetched articles: %s' % last_fetched_articles)
 
-            resp = requests.get(self._seminar_url + seminar)
-            if resp.status_code / 100 != 2:
-                continue
-            # logger.debug('Seminar [%s] content: \n %s' % (seminar, resp.text))
-            soup = BeautifulSoup(resp.text)
-
-            ul = soup.find('ul', class_='note-list')
+            page_num = 1
+            repeated = False
             num = 0
-
-            for li in ul.find_all('li'):
-                try:
-                    # Judge shared time to avoid repeated fetching
-                    time_span = li.find('span', class_='time')
-                    write_time = time_span['data-shared-at']
-                    if (not self._debug) and time.mktime(time.strptime(write_time, '%Y-%m-%dT%H:%M:%S+08:00')) <= time.time() - 86400 * 10:
-                        logger.info('Jianshu fetch too old article(time:%s)' % (write_time))
-                        break
-                    if num > self._limit:
-                        break
-                    a = li.find('a', class_='title')
-                    href = a['href']
-                    article = self.fetch_article_from_url(self._jianshu + href)
-                    if article:
-                        title = repr(article.title)
-                        if title in last_fetched_articles:
-                            break
-                        res.append(article)
-                        this_fetched_articles.append(title)
-                        num += 1
-                except Exception as e:
-                    print(e)
+            while page_num < 3 and (not repeated):
+                resp = requests.get(self._seminar_url % (seminar, page_num))
+                page_num += 1
+                if resp.status_code / 100 != 2:
                     continue
+                # logger.debug('Seminar [%s] content: \n %s' % (seminar, resp.text))
+                soup = BeautifulSoup(resp.text)
+
+                ul = soup.find('ul', class_='note-list')
+
+                for li in ul.find_all('li'):
+                    try:
+                        # Judge shared time to avoid repeated fetching
+                        time_span = li.find('span', class_='time')
+                        write_time = time_span['data-shared-at']
+                        if num > self._limit:
+                            repeated = True
+                            break
+                        a = li.find('a', class_='title')
+                        href = a['href']
+                        article = self.fetch_article_from_url(self._jianshu + href)
+                        if article:
+                            title = repr(article.title)
+                            if title in last_fetched_articles:
+                                repeated = True
+                                break
+                            res.append(article)
+                            this_fetched_articles.append(title)
+                            num += 1
+                    except Exception as e:
+                        logger.error(e)
+                        continue
 
             # clear last fetched articles
             if not self._debug:
