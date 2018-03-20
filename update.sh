@@ -1,4 +1,4 @@
-contName=fetcher
+contName=$1
 docker stop ${contName};
 docker rm ${contName};
 docker build -t yugong-fetcher -f fetch.Dockerfile .
