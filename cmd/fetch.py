@@ -19,7 +19,7 @@ if __name__ == '__main__':
     fetchers = [jianshu.Jianshu()]
     analytizer = Analytizer()
     client = db.get_redis_client(config.get('app.redis'))
-    time_point = [6, 20]
+    time_point = [6, 17]
     while True:
         try:
             t = time.localtime(time.time())

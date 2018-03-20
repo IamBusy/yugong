@@ -32,9 +32,10 @@ if __name__ == '__main__':
                         article_json = json.loads(article_str)
                         article = Article()
                         article.rebuild(article_json)
-                        if article and not client.sismember(published_key, repr(article.title)):
+                        title = repr(article.title)
+                        if article and (not client.sismember(published_key, title)):
                             publisher.publish(article)
-                            client.sadd(published_key, repr(article.title))
+                            client.sadd(published_key, title)
                     except Exception as e:
                         logger.error('Pickle loads article error')
                         logger.error(e)

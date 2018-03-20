@@ -9,3 +9,4 @@ numpy==1.14.1
 pymongo==3.6.0
 beautifulsoup4==4.6.0
 jieba==0.39
+selenium==3.8.1
