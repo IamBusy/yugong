@@ -13,40 +13,39 @@
 import requests
 import json
 from bs4 import BeautifulSoup
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver import ActionChains
-import base64
-import random
+# from selenium.webdriver.common.by import By
+# from selenium.webdriver.support.ui import WebDriverWait
+# from selenium.webdriver.support import expected_conditions as EC
+# from selenium.webdriver import ActionChains
+# import base64
+# import random
 
 from entities import Article
 from core import config
 from utils import uploader
 from core import logger
-from utils import browser
+#from utils import browser
 
 
-class ToutiaoOperator(object):
-
-    _login_url = 'https://sso.toutiao.com/login/?service=https://mp.toutiao.com/sso_confirm/?redirect_url=/'
-
-    def __init__(self):
-        self._browser = browser.get()
-        self._wait = WebDriverWait(self._browser, 10)
-        self._login()
-        pass
-
-    def _login(self):
-        self._browser.get(self._login_url)
-        name = self._wait.until(EC.presence_of_element_located((By.ID, 'account')))
-        pwd = self._wait.until(EC.presence_of_element_located((By.ID, 'password')))
-        captcha = self._wait.until(EC.presence_of_element_located((By.ID, 'captcha')))
-        captcha_img = self._wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'captcha')))
-        img_name = str(random.random())[2:] + '.gif'
-        with open(config.APP_PATH + '/storage/cache/' + img_name, 'ab') as f:
-            f.write(base64.b64decode(captcha_img.get_attribute('src').split('base64,')[1]))
-
+# class ToutiaoOperator(object):
+#
+#     _login_url = 'https://sso.toutiao.com/login/?service=https://mp.toutiao.com/sso_confirm/?redirect_url=/'
+#
+#     def __init__(self):
+#         self._browser = browser.get()
+#         self._wait = WebDriverWait(self._browser, 10)
+#         self._login()
+#         pass
+#
+#     def _login(self):
+#         self._browser.get(self._login_url)
+#         name = self._wait.until(EC.presence_of_element_located((By.ID, 'account')))
+#         pwd = self._wait.until(EC.presence_of_element_located((By.ID, 'password')))
+#         captcha = self._wait.until(EC.presence_of_element_located((By.ID, 'captcha')))
+#         captcha_img = self._wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'captcha')))
+#         img_name = str(random.random())[2:] + '.gif'
+#         with open(config.APP_PATH + '/storage/cache/' + img_name, 'ab') as f:
+#             f.write(base64.b64decode(captcha_img.get_attribute('src').split('base64,')[1]))
 
 
 class Toutiao:
