@@ -15,4 +15,5 @@ takes responsibility to rank them, the top K articles will be published by `publ
  - [x] Record articles published in one months
  - [x] Build docker image
  - [ ] Judge the rate of content / code
+ - [ ] Remove qrcode
 
