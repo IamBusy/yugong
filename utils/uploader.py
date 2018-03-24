@@ -31,8 +31,12 @@ def upload(url: str):
             ret, info = _bucket_manager.fetch(url, _bucket, key)
         else:
             ret, info = put_file(token, key, url)
+
         if ret and ret['key'] == key:
             logger.info('Qiniu upload [%s] success' % url)
             return _domain + key
+        else:
+            logger.info('Qiniu upload [%s] failed with [%s]' % (url, ret))
+        try_time -= 1
     raise ConnectionError('qiniu service is not available')
 
