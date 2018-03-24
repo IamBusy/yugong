@@ -33,3 +33,7 @@ def get(key):
     _check_enable()
     return _client.get(key)
 
+
+def delete(key):
+    _check_enable()
+    return _client.delete(key)

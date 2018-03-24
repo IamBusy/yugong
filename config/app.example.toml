@@ -21,9 +21,13 @@ driver = "file"
 
 
 [toutiao]
+account=""
+password=""
 access_token="token"
 client_key = "key"
 client_secret="secret"
+notify_receiver=""
+nofity_url="XXX/a.php?img=%s&key=%s"
 
 [qiniu]
 access_key="key"
@@ -31,3 +35,7 @@ secret_key="key"
 bucket="toutiao"
 #domain="http://cdn-td.xiaolewei.com/"
 domain="domain"
+
+[mail]
+account="act"
+password="pwd"
