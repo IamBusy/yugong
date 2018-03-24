@@ -13,7 +13,7 @@
 import time
 import json
 from core import db, config, logger
-from publisher.toutiao import Toutiao
+from publisher.toutiao import Toutiao, ToutiaoOperator
 from entities import Article
 
 
@@ -46,6 +46,9 @@ if __name__ == '__main__':
                         logger.error(e)
                     finally:
                         article_str = client.lpop('fetched_article')
+
+                operator = ToutiaoOperator()
+                operator.schedule()
                 logger.info('Start to sleep... [3600s]')
                 time.sleep(3600)
         except Exception as e:
