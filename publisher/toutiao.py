@@ -194,7 +194,7 @@ class ToutiaoOperator(object):
             except Exception as e:
                 logger.info('Schedule article failed')
                 logger.error(e)
-        self.publish(articles)
+        self.publish([articles[-1]])
 
 
 class Toutiao:
