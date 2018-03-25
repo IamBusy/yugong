@@ -9,7 +9,7 @@ RUN ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     pip3 install --no-cache-dir -r requirements.txt
 
 ENV app=fetch
-COPY . /usr/local/lib/python3.6/site-packages
+COPY . /usr/lib/python3/dist-packages
 COPY . .
 
-CMD "python" "cmd/${app}.py"
+CMD "python3" "cmd/${app}.py"
