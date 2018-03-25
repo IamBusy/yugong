@@ -20,7 +20,9 @@ from entities import Article
 if __name__ == '__main__':
     client = db.get_redis_client(config.get('app.redis'))
     publish_point = [6, 17]
+    toutiao_publish_point = [6, 7, 8, 12, 13, 14, 17, 18, 19, 20]
     publisher = Toutiao()
+    operator = ToutiaoOperator()
     published_key = 'published_articles'
     while True:
         try:
@@ -46,8 +48,7 @@ if __name__ == '__main__':
                         logger.error(e)
                     finally:
                         article_str = client.lpop('fetched_article')
-
-                operator = ToutiaoOperator()
+            if t.tm_hour in toutiao_publish_point:
                 operator.schedule()
                 logger.info('Start to sleep... [3600s]')
                 time.sleep(3600)
