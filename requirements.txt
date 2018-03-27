@@ -11,3 +11,4 @@ beautifulsoup4==4.6.0
 jieba==0.39
 selenium==3.8.1
 pyvirtualdisplay==0.2.1
+zhon==1.1.5

@@ -12,20 +12,18 @@
 
 import requests
 import json
-import shutil
 import os
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver import ActionChains
 import base64
 import random
+from zhon.hanzi import punctuation
 
 from entities import Article
 from core import config
-from utils import uploader
 from core import logger,  mail, cache
 from utils import browser, uploader
 import time
@@ -241,7 +239,7 @@ class Toutiao:
         for x in range(len(article.title)):
             if alpha_num / 2 + word_num >= 28:
                 article.title = article.title[:x]
-            if u'/u4e00' <= article.title[x] <= u'/u9fa5':
+            if article.title[x] in punctuation or (u'/u4e00' <= article.title[x] <= u'/u9fa5'):
                 word_num += 1
             else:
                 alpha_num += 1

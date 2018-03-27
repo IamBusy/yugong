@@ -1,15 +1,13 @@
-FROM markadams/chromium-xvfb-py3
-
-WORKDIR /usr/src/app
+FROM williamwxl/chromium-xvfb-py3.6
 
 COPY requirements.txt ./
 
 RUN ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo Asia/Shanghai > /etc/timezone && \
-    pip3 install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r requirements.txt
 
 ENV app=fetch
-COPY . /usr/lib/python3/dist-packages
+COPY . /usr/local/lib/python3.6/site-packages
 COPY . .
 
-CMD "python3" "cmd/${app}.py"
+CMD "python" "cmd/${app}.py"

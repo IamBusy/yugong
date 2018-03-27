@@ -16,5 +16,5 @@ takes responsibility to rank them, the top K articles will be published by `publ
  - [x] Build docker image
  - [ ] Judge the rate of content / code
  - [ ] Remove qrcode
- - [ ] Mock browser to operate toutiao platform
+ - [x] Mock browser to operate toutiao platform
 
