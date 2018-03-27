@@ -16,15 +16,17 @@ from core import db, config, logger
 from analysis.analytizer import Analytizer
 
 if __name__ == '__main__':
-    fetchers = [jianshu.Jianshu()]
-    analytizer = Analytizer()
-    client = db.get_redis_client(config.get('app.redis'))
     time_point = [6, 17]
     while True:
         try:
             t = time.localtime(time.time())
             if t.tm_hour not in time_point:
                 continue
+
+            fetchers = [jianshu.Jianshu()]
+            analytizer = Analytizer()
+            client = db.get_redis_client(config.get('app.redis'))
+
             articles = []
             for f in fetchers:
                 for article in f.fetch():
