@@ -13,7 +13,6 @@
 import sys
 import time
 import json
-from crontabs import Cron, Tab
 from core import db, config, logger
 from publisher.toutiao import Toutiao, ToutiaoOperator
 from entities import Article
