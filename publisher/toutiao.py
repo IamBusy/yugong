@@ -51,17 +51,17 @@ class ToutiaoOperator(object):
         logger.notice('=================Waiting for recognize=================')
         logger.notice('[%s] [%s]' % (key, qiniu_url))
         link_url = config.get('app.toutiao.notify_url') % (qiniu_url, key)
-        mail.send(config.get('app.toutiao.notify_receiver'),
-                 'Yugong-captcha', "<h2>%s</h2><a src=\"%s\">填写</a>" % (key, link_url))
-        res = cache.get('captcha-%s' % key)
-        while not res:
-            logger.info('waiting for recognize captcha')
-            time.sleep(10)
-            res = cache.get('captcha-%s' % key)
-        print(type(res))
-        if isinstance(res, bytes):
-            res = bytes.decode(res)
-        # res = input('Please input the captcha')
+        #mail.send(config.get('app.toutiao.notify_receiver'),
+        #         'Yugong-captcha', "<h2>%s</h2><a src=\"%s\">填写</a>" % (key, link_url))
+        # res = cache.get('captcha-%s' % key)
+        # while not res:
+        #     logger.info('waiting for recognize captcha')
+        #     time.sleep(10)
+        #     res = cache.get('captcha-%s' % key)
+        # print(type(res))
+        # if isinstance(res, bytes):
+        #     res = bytes.decode(res)
+        res = input('Please input the captcha')
         cache.delete('captcha-%s' % key)
         logger.info('Get recognized captcha [%s]' % res)
         return str(res)
@@ -87,6 +87,7 @@ class ToutiaoOperator(object):
                 time.sleep(5)
                 # cookie has expired, remove it
                 if 'login' in self._browser.current_url:
+                    self._browser.get(self._login_url)
                     logger.notice('Login toutiao with cookie file failed')
                     os.remove(cookie_file)
                 else:
@@ -100,7 +101,9 @@ class ToutiaoOperator(object):
                 if '手机验证码' in tips:
                     # TODO login by phone
                     logger.notice('Not supported to login by phone')
-                    exit(-1)
+                    time.sleep(60)
+                    self._update_cookie()
+                    break
             except NoSuchElementException as e:
                 pass
             logger.info('Try to login toutiao [%s]' % self._browser.current_url)
@@ -120,11 +123,16 @@ class ToutiaoOperator(object):
             time.sleep(10)
             err = self._browser.find_element_by_class_name('error-msg')
             print(err)
+        self._update_cookie()
+        logger.info('login toutiao successfully')
+
+    def _update_cookie(self):
+        cookie_file = (config.APP_PATH + '/storage/cache/toutiao/%s.txt') % config.get('app.toutiao.account')
+        if not os.path.exists(os.path.split(cookie_file)[0]):
+            os.makedirs(os.path.split(cookie_file)[0])
         json_cookie = json.dumps(self._browser.get_cookies())
-        os.makedirs(os.path.split(cookie_file)[0])
         with open(cookie_file, 'w+') as f:
             f.write(json_cookie)
-        logger.info('login toutiao successfully')
 
     def _get_action_xpath(self):
         if 'graphic/publish' not in self._browser.current_url:
@@ -133,7 +141,7 @@ class ToutiaoOperator(object):
             'cover': {
                 'single': '//div[@class="article-cover"]//label[1]//input',
                 'triple': '//div[@class="article-cover"]//label[2]//input',
-                'auto': '//div[@class="article-cover"]//label[2]//input',
+                'auto': '//div[@class="article-cover"]//label[3]//input',
             },
             'ad': {
                 'toutiao': '//div[@class="form-wrap"]/div[2]//label[1]//input',
@@ -148,6 +156,7 @@ class ToutiaoOperator(object):
             }
         }
 
+
     def publish(self, articles):
         for article_id in articles:
             try:
@@ -158,20 +167,22 @@ class ToutiaoOperator(object):
                 ad_toutiao = self._wait.until(EC.presence_of_element_located((By.XPATH, xpaths['ad']['toutiao']))),
                 cover_auto = self._wait.until(EC.presence_of_element_located((By.XPATH, xpaths['cover']['auto']))),
                 publish_btn = self._wait.until(EC.presence_of_element_located((By.XPATH, xpaths['action']['publish']))),
-                ad_toutiao.click()
-                cover_auto.click()
-                publish_btn.click()
+                ad_toutiao[0].click()
+                cover_auto[0].click()
+                publish_btn[0].click()
             except Exception as e:
                 logger.error('Publish failed')
                 logger.error(e)
             finally:
                 time.sleep(10)
 
-    def schedule(self):
+    def schedule(self, num=1):
         '''
         Get all the article in drafted status, and publish them
         :return:
         '''
+        self._browser.get(url=self._graphic_url)
+        time.sleep(3)
         self._browser.execute_script("window.scrollTo(0,document.body.scrollHeight)")
         time.sleep(2)
         soup = BeautifulSoup(self._browser.page_source)
@@ -192,7 +203,8 @@ class ToutiaoOperator(object):
             except Exception as e:
                 logger.info('Schedule article failed')
                 logger.error(e)
-        self.publish([articles[-1]])
+        self.publish(articles[-num:])
+        self._update_cookie()
 
 
 class Toutiao:

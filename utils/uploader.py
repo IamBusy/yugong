@@ -36,7 +36,8 @@ def upload(url: str):
             logger.info('Qiniu upload [%s] success' % url)
             return _domain + key
         else:
-            logger.info('Qiniu upload [%s] failed with [%s]' % (url, ret))
+            logger.info('Qiniu upload [%s] failed with [%r]' % (url, ret))
         try_time -= 1
+        time.sleep(random.randint(1, 3))
     raise ConnectionError('qiniu service is not available')
 
