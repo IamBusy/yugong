@@ -127,12 +127,18 @@ class ToutiaoOperator(object):
         logger.info('login toutiao successfully')
 
     def _update_cookie(self):
+        key = 'yugong.toutiao.cookie.%s' % config.get('app.toutiao.account')
         cookie_file = (config.APP_PATH + '/storage/cache/toutiao/%s.txt') % config.get('app.toutiao.account')
         if not os.path.exists(os.path.split(cookie_file)[0]):
             os.makedirs(os.path.split(cookie_file)[0])
         json_cookie = json.dumps(self._browser.get_cookies())
+        cache.put(key, json_cookie)
         with open(cookie_file, 'w+') as f:
             f.write(json_cookie)
+
+    def _get_saved_cookie(self):
+        key = 'yugong.toutiao.cookie.%s' % config.get('app.toutiao.account')
+        return cache.get(key)
 
     def _get_action_xpath(self):
         if 'graphic/publish' not in self._browser.current_url:
