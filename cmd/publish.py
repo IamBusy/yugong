@@ -57,7 +57,7 @@ if __name__ == '__main__':
     else:
         publish_time_point = [6, 17]
         last_publish_time = None
-        operate_time_point = [6, 8, 11, 12, 5, 6, 8, 9, 12]
+        operate_time_point = [6, 8, 11, 12, 17, 18, 20, 21, 0]
         last_operate_time = None
         while True:
             t = time.localtime(time.time())

@@ -74,25 +74,38 @@ class ToutiaoOperator(object):
         :return:
         '''
         self._browser.get(self._login_url)
-        cookie_file = (config.APP_PATH + '/storage/cache/toutiao/%s.txt') % config.get('app.toutiao.account')
-        print(cookie_file)
-        print(os.path.exists(cookie_file))
-        if os.path.exists(cookie_file):
-            logger.info('Login toutiao with cookie file')
-            with open(cookie_file) as f:
-                cookies = json.loads(f.read())
-                for cookie in cookies:
-                    self._browser.add_cookie(cookie)
-                self._browser.get(self._graphic_url)
-                time.sleep(5)
-                # cookie has expired, remove it
-                if 'login' in self._browser.current_url:
-                    self._browser.get(self._login_url)
-                    logger.notice('Login toutiao with cookie file failed')
-                    os.remove(cookie_file)
-                else:
-                    logger.info('Login toutiao with cookie successfully')
-                    return
+        cached_cookie = self._get_saved_cookie()
+        cookies = json.loads(cached_cookie)
+        for cookie in cookies:
+            self._browser.add_cookie(cookie)
+        self._browser.get(self._graphic_url)
+        time.sleep(5)
+        # cookie has expired, remove it
+        if 'login' in self._browser.current_url:
+            self._browser.get(self._login_url)
+            logger.notice('Login toutiao with cached cookie failed')
+        else:
+            logger.info('Login toutiao with cookie successfully')
+
+        # cookie_file = (config.APP_PATH + '/storage/cache/toutiao/%s.txt') % config.get('app.toutiao.account')
+        # print(cookie_file)
+        # print(os.path.exists(cookie_file))
+        # if os.path.exists(cookie_file):
+        #     logger.info('Login toutiao with cookie file')
+        #     with open(cookie_file) as f:
+        #         cookies = json.loads(f.read())
+        #         for cookie in cookies:
+        #             self._browser.add_cookie(cookie)
+        #         self._browser.get(self._graphic_url)
+        #         time.sleep(5)
+        #         # cookie has expired, remove it
+        #         if 'login' in self._browser.current_url:
+        #             self._browser.get(self._login_url)
+        #             logger.notice('Login toutiao with cookie file failed')
+        #             os.remove(cookie_file)
+        #         else:
+        #             logger.info('Login toutiao with cookie successfully')
+        #             return
 
         while 'login' in self._browser.current_url:
             try:
@@ -173,6 +186,7 @@ class ToutiaoOperator(object):
                 ad_toutiao = self._wait.until(EC.presence_of_element_located((By.XPATH, xpaths['ad']['toutiao']))),
                 cover_auto = self._wait.until(EC.presence_of_element_located((By.XPATH, xpaths['cover']['auto']))),
                 publish_btn = self._wait.until(EC.presence_of_element_located((By.XPATH, xpaths['action']['publish']))),
+                logger.debug('Captcha button: ', ad_toutiao, cover_auto, publish_btn)
                 ad_toutiao[0].click()
                 cover_auto[0].click()
                 publish_btn[0].click()
