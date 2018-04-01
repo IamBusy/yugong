@@ -31,7 +31,10 @@ def put(key, value, ttl=None):
 
 def get(key):
     _check_enable()
-    return _client.get(key)
+    val = _client.get(key)
+    if isinstance(val, bytes):
+        val = bytes.decode(val)
+    return val
 
 
 def delete(key):
