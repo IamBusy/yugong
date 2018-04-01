@@ -11,6 +11,7 @@
 """
 
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 # from pyvirtualdisplay import Display
 #
 # # display = Display(visible=1, size=(800, 600))
@@ -19,6 +20,8 @@ from selenium import webdriver
 
 
 def get():
-    browser = webdriver.Chrome()
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')
+    browser = webdriver.Chrome(chrome_options=chrome_options)
     browser.set_window_size(800, 600)
     return browser
