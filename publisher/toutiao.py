@@ -182,6 +182,7 @@ class ToutiaoOperator(object):
             finally:
                 time.sleep(10)
 
+    @logger.log('Operate')
     def schedule(self, num=1):
         '''
         Get all the article in drafted status, and publish them
@@ -202,13 +203,13 @@ class ToutiaoOperator(object):
                 if status != '草稿':
                     logger.info('Schedule skip [%s] due to [%s]' % (title, status))
                     continue
-                print(title_div.a)
                 url = title_div.a['href']
                 idx = url.rfind('=')
                 articles.append(url[idx+1:])
             except Exception as e:
                 logger.info('Schedule article failed')
                 logger.error(e)
+        logger.info('Find [%d] articles are in ready' % len(articles))
         self.publish(articles[-num:])
         self._update_cookie()
 

@@ -58,7 +58,7 @@ def log(*args):
             def wrapper(*arg, **kwa):
                 get(args[0]).info("Start call function [%s] with %s, %s" % (func.__name__, args, kwa))
                 func(*arg, **kwa)
-                get(args[0]).info("End call function [%s]" % func.__name__)
+                get(args[0]).info("=================End call function [%s]===============" % func.__name__)
             return wrapper
         return decorator
     else:
@@ -68,7 +68,7 @@ def log(*args):
         def wrapper(*arg, **kwa):
             info("Start call function [%s] with %s, %s" % (func.__name__, args, kwa))
             func(*arg, **kwa)
-            info("End call function [%s]" % func.__name__)
+            info("===============End call function [%s]===============" % func.__name__)
         return wrapper
 
 
