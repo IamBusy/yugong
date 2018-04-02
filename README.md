@@ -17,4 +17,9 @@ takes responsibility to rank them, the top K articles will be published by `publ
  - [ ] Judge the rate of content / code
  - [ ] Remove qrcode
  - [x] Mock browser to operate toutiao platform
+ - [ ] Support multi-accounts
+ - [ ] Support [dayu](https://mp.dayu.com/dashboard/index)
+ - [ ] Support [baijiahao](http://baijiahao.baidu.com/)
+ 
+
 

@@ -23,7 +23,7 @@ import random
 from zhon.hanzi import punctuation
 
 from entities import Article
-from core import config
+from core import config, db
 from core import logger,  mail, cache
 from utils import browser, uploader
 import time
@@ -42,18 +42,23 @@ class ToutiaoOperator(object):
         pass
 
     def _wait_for_recognize_captcha(self, encoded_captcha):
+        etcd = db.get_etcd_client(config.get('app.db.etcd'))
+        key = 'yugong/toutiao/login/captcha/%d' % random.randint(0, 999999)
         img_name = str(random.random())[2:] + '.gif'
         local_file = config.APP_PATH + '/storage/cache/' + img_name
         with open(local_file, 'ab') as f:
             f.write(base64.b64decode(encoded_captcha.split('base64,')[1]))
         qiniu_url = uploader.upload(config.APP_PATH + '/storage/cache/' + img_name)
-        key = random.randint(0, 999999)
         logger.notice('=================Waiting for recognize=================')
         logger.notice('[%s] [%s]' % (key, qiniu_url))
         link_url = config.get('app.toutiao.notify_url') % (qiniu_url, key)
-        #mail.send(config.get('app.toutiao.notify_receiver'),
-        #         'Yugong-captcha', "<h2>%s</h2><a src=\"%s\">填写</a>" % (key, link_url))
-        # res = cache.get('captcha-%s' % key)
+        mail.send(config.get('app.toutiao.notify_receiver'),
+                'Yugong-captcha', "<h2>%s</h2><img src=\"%s\" /><a href=\"%s\">填写</a>" % (key, qiniu_url, link_url))
+        rtn = etcd.watch(key)
+        print(rtn)
+        etcd.delete(key)
+        return rtn.value
+
         # while not res:
         #     logger.info('waiting for recognize captcha')
         #     time.sleep(10)
@@ -61,10 +66,17 @@ class ToutiaoOperator(object):
         # print(type(res))
         # if isinstance(res, bytes):
         #     res = bytes.decode(res)
-        res = input('Please input the captcha')
-        cache.delete('captcha-%s' % key)
+
+        #res = input('Please input the captcha')
+        #cache.delete('captcha-%s' % key)
         logger.info('Get recognized captcha [%s]' % res)
         return str(res)
+
+    def _wait_for_phone_num(self, phone):
+        key = 'yugong/toutiao/login/phone/%s' % phone
+        etcd = db.get_etcd_client(config.get('app.db.etcd'))
+        rtn = etcd.watch(key)
+        return rtn.value
 
     def _login(self):
         '''
@@ -75,11 +87,12 @@ class ToutiaoOperator(object):
         '''
         self._browser.get(self._login_url)
         cached_cookie = self._get_saved_cookie()
-        cookies = json.loads(cached_cookie)
-        for cookie in cookies:
-            self._browser.add_cookie(cookie)
-        self._browser.get(self._graphic_url)
-        time.sleep(5)
+        if cached_cookie and len(cached_cookie) > 0:
+            cookies = json.loads(cached_cookie)
+            for cookie in cookies:
+                self._browser.add_cookie(cookie)
+            self._browser.get(self._graphic_url)
+            time.sleep(5)
         # cookie has expired, remove it
         if 'login' in self._browser.current_url:
             self._browser.get(self._login_url)
@@ -112,9 +125,17 @@ class ToutiaoOperator(object):
                 err = self._browser.find_element_by_class_name('error-msg')
                 tips = err.text.strip('\t\r\n ')
                 if '手机验证码' in tips:
-                    # TODO login by phone
-                    logger.notice('Not supported to login by phone')
-                    time.sleep(60)
+                    phone_num = config.get('app.toutiao.phone')
+                    logger.notice('Verify account by phone number')
+                    phone = self._wait.until(EC.presence_of_element_located((By.ID, 'mobile')))
+                    code = self._wait.until(EC.presence_of_element_located((By.ID, 'code')))
+                    send_btn = self._wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'code-btn')))
+                    submitBtn = self._wait.until(EC.presence_of_element_located((By.NAME, 'submitBtn')))
+                    phone.send_keys(phone_num)
+                    send_btn.click()
+                    received_code = self._wait_for_phone_num(phone_num)
+                    code.send_keys(received_code)
+                    submitBtn.click()
                     self._update_cookie()
                     break
             except NoSuchElementException as e:
@@ -133,7 +154,7 @@ class ToutiaoOperator(object):
             pwd.send_keys(config.get('app.toutiao.password'))
             captcha.send_keys(recognized_captcha)
             submit.submit()
-            time.sleep(10)
+            time.sleep(3)
             err = self._browser.find_element_by_class_name('error-msg')
             print(err)
         self._update_cookie()
@@ -150,6 +171,7 @@ class ToutiaoOperator(object):
             f.write(json_cookie)
 
     def _get_saved_cookie(self):
+        return ''
         key = 'yugong.toutiao.cookie.%s' % config.get('app.toutiao.account')
         return cache.get(key)
 
@@ -226,6 +248,7 @@ class ToutiaoOperator(object):
         logger.info('Find [%d] articles are in ready' % len(articles))
         self.publish(articles[-num:])
         self._update_cookie()
+        self._browser.quit()
 
 
 class Toutiao:

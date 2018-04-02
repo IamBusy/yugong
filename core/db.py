@@ -13,6 +13,7 @@
 from orator import DatabaseManager
 from pymongo import MongoClient
 import redis
+import etcd
 
 # TODO Reuse connections
 __clients = {}
@@ -43,3 +44,7 @@ def get_redis_client(config):
     return redis.Redis(host=config['host'],
                        port=config['port'],
                        db=config['db'])
+
+
+def get_etcd_client(config):
+    return etcd.Client(host=config['host'], port=config['port'])
