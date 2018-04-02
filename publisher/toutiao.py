@@ -171,7 +171,6 @@ class ToutiaoOperator(object):
             f.write(json_cookie)
 
     def _get_saved_cookie(self):
-        return ''
         key = 'yugong.toutiao.cookie.%s' % config.get('app.toutiao.account')
         return cache.get(key)
 
