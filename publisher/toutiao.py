@@ -211,6 +211,14 @@ class ToutiaoOperator(object):
                 ad_toutiao[0].click()
                 cover_auto[0].click()
                 publish_btn[0].click()
+                try:
+                    body = self._wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'dialog-body')))
+                    if '手机动态验证' in body.getText():
+                        logger.info('Need to verify phone number')
+                except Exception as e:
+                    logger.error(e)
+                    pass
+
             except Exception as e:
                 logger.error('Publish failed')
                 logger.error(e)
@@ -224,11 +232,12 @@ class ToutiaoOperator(object):
         :return:
         '''
         self._browser.get(url=self._graphic_url)
-        time.sleep(3)
+        time.sleep(10)
         self._browser.execute_script("window.scrollTo(0,document.body.scrollHeight)")
-        time.sleep(2)
+        time.sleep(6)
         soup = BeautifulSoup(self._browser.page_source)
         articles = []
+        self._wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'article-card')))
         for card in soup.find_all('div', class_='article-card'):
             try:
                 title_div = card.find('div', class_='master-title')
