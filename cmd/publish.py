@@ -24,6 +24,8 @@ def publish_toutiao():
     publisher = Toutiao()
     logger.info('Start toutiao publish-processing...')
     article_str = client.lpop('fetched_article')
+    if isinstance(article_str, bytes):
+        article_str = bytes.decode(article_str)
     while article_str and len(article_str) > 0:
         logger.info('Fetched article str from redis')
         try:
@@ -45,8 +47,11 @@ def publish_toutiao():
 
 
 def operate_toutiao():
-    operator = ToutiaoOperator()
-    operator.schedule()
+    try:
+        operator = ToutiaoOperator()
+        operator.schedule()
+    except Exception as e:
+        del operator
 
 
 if __name__ == '__main__':

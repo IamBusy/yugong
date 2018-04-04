@@ -41,6 +41,9 @@ class ToutiaoOperator(object):
         self._login()
         pass
 
+    def __del__(self):
+        self._browser.quit()
+
     def _wait_for_recognize_captcha(self, encoded_captcha):
         etcd = db.get_etcd_client(config.get('app.db.etcd'))
         key = 'yugong/toutiao/login/captcha/%d' % random.randint(0, 999999)
@@ -256,7 +259,6 @@ class ToutiaoOperator(object):
         logger.info('Find [%d] articles are in ready' % len(articles))
         self.publish(articles[-num:])
         self._update_cookie()
-        self._browser.quit()
 
 
 class Toutiao:
