@@ -32,6 +32,8 @@ if __name__ == '__main__':
                 for article in f.fetch():
                     analytizer.estimate(article)
                     articles.append(article)
+                del f
+            del analytizer
             articles = sorted(articles, reverse=True)
             for article in articles:
                 article.summary = None
@@ -39,6 +41,7 @@ if __name__ == '__main__':
                 rtn = client.rpush('fetched_article', article_str)
                 if rtn:
                     logger.info('Push [%s] to redis successfully' % repr(article.title))
+            del articles
             logger.info('Starting sleep 3600s...')
             time.sleep(3600)
         except Exception as e:
