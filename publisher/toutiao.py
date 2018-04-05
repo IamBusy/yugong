@@ -42,7 +42,7 @@ class ToutiaoOperator(object):
         pass
 
     def __del__(self):
-        self._browser.quit()
+        self._browser.close()
 
     def _wait_for_recognize_captcha(self, encoded_captcha):
         etcd = db.get_etcd_client(config.get('app.db.etcd'))
