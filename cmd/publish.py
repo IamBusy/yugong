@@ -24,11 +24,11 @@ def publish_toutiao():
     publisher = Toutiao()
     logger.info('Start toutiao publish-processing...')
     article_str = client.lpop('fetched_article')
-    if isinstance(article_str, bytes):
-        article_str = bytes.decode(article_str)
     while article_str and len(article_str) > 0:
         logger.info('Fetched article str from redis')
         try:
+            if isinstance(article_str, bytes):
+                article_str = bytes.decode(article_str)
             article_json = json.loads(article_str)
             article = Article()
             article.rebuild(article_json)
