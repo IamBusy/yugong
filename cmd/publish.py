@@ -51,6 +51,7 @@ def operate_toutiao():
         operator = ToutiaoOperator()
         operator.schedule()
     except Exception as e:
+        print(e)
         del operator
 
 
