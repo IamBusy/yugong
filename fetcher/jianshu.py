@@ -53,6 +53,7 @@ class Jianshu:
     def fetch_from_seminar(self):
         res = []
         for seminar in self._seminars:
+            logger.info('Start to fetch articles in seminar [%s]' % seminar)
             set_key = 'last_fetched_article_by_seminar_' + seminar
             last_fetched_articles = self._set_manager.smembers(set_key)
             this_fetched_articles = []
