@@ -12,3 +12,4 @@ jieba==0.39
 selenium==3.8.1
 zhon==1.1.5
 python_etcd==0.4.5
+user_agent==0.1.9

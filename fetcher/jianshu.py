@@ -15,6 +15,15 @@ import requests
 from bs4 import BeautifulSoup
 from core import config, cache, logger, db
 from entities import Article
+import user_agent
+
+headers = {'Connection': 'keep-alive',
+           'Cache-Control': 'max-age=0',
+           'Accept': 'text/html, */*; q=0.01',
+           'X-Requested-With': 'XMLHttpRequest',
+           'User-Agent': user_agent.generate_user_agent(),
+           'Accept-Encoding': 'gzip, deflate, sdch',
+           'Accept-Language': 'zh-CN,zh;q=0.8,ja;q=0.6'}
 
 
 class Jianshu:
@@ -31,7 +40,7 @@ class Jianshu:
         self._set_manager = db.get_redis_client(config.get('app.redis'))
 
     def fetch_article_from_url(self, url):
-        resp = requests.get(url)
+        resp = requests.get(url, headers=headers)
         soup = BeautifulSoup(resp.text)
         article = soup.find('div', class_='article')
         title = article.h1.string
@@ -53,9 +62,10 @@ class Jianshu:
             repeated = False
             num = 0
             while page_num < 3 and (not repeated):
-                resp = requests.get(self._seminar_url % (seminar, page_num))
+                resp = requests.get(self._seminar_url % (seminar, page_num), headers=headers)
                 page_num += 1
                 if resp.status_code / 100 != 2:
+                    logger.error('Failed to request [%s] ' % (self._seminar_url % (seminar, page_num - 1)))
                     continue
                 # logger.debug('Seminar [%s] content: \n %s' % (seminar, resp.text))
                 soup = BeautifulSoup(resp.text)
