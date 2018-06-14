@@ -23,8 +23,8 @@ if __name__ == '__main__':
             if t.tm_hour not in time_point:
                 continue
             cfg = jianshu.Config({
-                'seminars': config.get('app.fetcher.jianshu.seminars'),
-                'limit': config.get('app.fetcher.jianshu.limit'),
+                'seminars': config.get('fetcher.jianshu.seminars'),
+                'limit': config.get('fetcher.jianshu.limit'),
                 'debug': config.get('app.debug')
             })
             fetchers = [jianshu.Jianshu(cfg)]

@@ -27,8 +27,8 @@ headers = {'Connection': 'keep-alive',
 
 class Config(object):
     def __init__(self, cfg: dict):
-        self.seminars = cfg['seminars'],
-        self.limit = cfg['limit'],
+        self.seminars = cfg['seminars']
+        self.limit = cfg['limit']
         self.debug = cfg['debug'] if 'debug' in cfg else True
 
 
