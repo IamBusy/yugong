@@ -10,10 +10,9 @@
 @time: 01/03/2018 20:44
 """
 
-import time
 import requests
 from bs4 import BeautifulSoup
-from core import config, cache, logger, db
+from core import config, logger, db
 from entities import Article
 import user_agent
 
@@ -26,17 +25,21 @@ headers = {'Connection': 'keep-alive',
            'Accept-Language': 'zh-CN,zh;q=0.8,ja;q=0.6'}
 
 
+class Config(object):
+    def __init__(self, cfg: dict):
+        self.seminars = cfg['seminars'],
+        self.limit = cfg['limit'],
+        self.debug = cfg['debug'] if 'debug' in cfg else True
+
+
 class Jianshu:
     _seminar_url = 'https://www.jianshu.com/c/%s?order_by=added_at&page=%d'
     _jianshu = 'https://www.jianshu.com'
     _cache_seminar_key = 'fetcher-jianshu-seminar-%s-last-time'
     _up_to_last_time = False
 
-    def __init__(self):
-        self._seminars = config.get('fetcher.jianshu.seminars')
-        self._limit = config.get('fetcher.jianshu.limit')
-        self._up_to_last_time = config.get('fetcher.jianshu.up_to_last_time')
-        self._debug = config.get('app.debug')
+    def __init__(self, cfg: Config):
+        self._config = cfg
         self._set_manager = db.get_redis_client(config.get('app.redis'))
 
     def fetch_article_from_url(self, url):
@@ -52,7 +55,7 @@ class Jianshu:
 
     def fetch_from_seminar(self):
         res = []
-        for seminar in self._seminars:
+        for seminar in self._config.seminars:
             logger.info('Start to fetch articles in seminar [%s]' % seminar)
             set_key = 'last_fetched_article_by_seminar_' + seminar
             last_fetched_articles = self._set_manager.smembers(set_key)
@@ -75,10 +78,9 @@ class Jianshu:
 
                 for li in ul.find_all('li'):
                     try:
-                        # Judge shared time to avoid repeated fetching
                         time_span = li.find('span', class_='time')
-                        write_time = time_span['data-shared-at']
-                        if num > self._limit:
+                        # write_time = time_span['data-shared-at']
+                        if num > self._config.limit:
                             repeated = True
                             break
                         a = li.find('a', class_='title')
@@ -97,7 +99,7 @@ class Jianshu:
                         continue
 
             # clear last fetched articles
-            if not self._debug:
+            if not self._config.debug:
                 num = len(last_fetched_articles)
                 while num > 0:
                     self._set_manager.spop(set_key)

@@ -22,8 +22,12 @@ if __name__ == '__main__':
             t = time.localtime(time.time())
             if t.tm_hour not in time_point:
                 continue
-
-            fetchers = [jianshu.Jianshu()]
+            cfg = jianshu.Config({
+                'seminars': config.get('app.fetcher.jianshu.seminars'),
+                'limit': config.get('app.fetcher.jianshu.limit'),
+                'debug': config.get('app.debug')
+            })
+            fetchers = [jianshu.Jianshu(cfg)]
             analytizer = Analytizer()
             client = db.get_redis_client(config.get('app.redis'))
 
