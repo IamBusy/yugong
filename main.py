@@ -42,13 +42,13 @@ def fetch(event, context):
 
 def publish_toutiao(event, context):
     import json
-    from publisher.toutiao.publisher import Toutiao
+    from publisher.toutiao.publisher import ToutiaoPublisher
     from core import logger, config, db
     from entities import Article
 
     client = db.get_redis_client(config.get('app.redis'))
     published_key = 'published_articles'
-    publisher = Toutiao()
+    publisher = ToutiaoPublisher()
     logger.info('Start toutiao publish-processing...')
     article_str = client.lpop('fetched_article')
     while article_str and len(article_str) > 0:
