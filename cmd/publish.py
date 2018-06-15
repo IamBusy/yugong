@@ -14,14 +14,15 @@ import sys
 import time
 import json
 from core import db, config, logger
-from publisher.toutiao import Toutiao, ToutiaoOperator
+from publisher.toutiao.publisher import ToutiaoPublisher
+from publisher.toutiao.operator import ToutiaoOperator
 from entities import Article
 
 
 def publish_toutiao():
     client = db.get_redis_client(config.get('app.redis'))
     published_key = 'published_articles'
-    publisher = Toutiao()
+    publisher = ToutiaoPublisher()
     logger.info('Start toutiao publish-processing...')
     article_str = client.lpop('fetched_article')
     while article_str and len(article_str) > 0:
