@@ -10,16 +10,12 @@
 @time: 19/01/2018 2:31 PM 
 """
 
-from orator import DatabaseManager
-from pymongo import MongoClient
-import redis
-import etcd
-
 # TODO Reuse connections
 __clients = {}
 
 
 def get_mysql_client(config):
+    from orator import DatabaseManager
     return DatabaseManager({
         'default': 'mysql',
         'mysql': config
@@ -27,6 +23,7 @@ def get_mysql_client(config):
 
 
 def get_mongo_client(config):
+    from pymongo import MongoClient
     for key in ['user', 'password', 'host', 'port']:
         if key not in config:
             config[key] = None
@@ -41,10 +38,12 @@ def get_mongo_client(config):
 
 
 def get_redis_client(config):
+    import redis
     return redis.Redis(host=config['host'],
                        port=config['port'],
                        db=config['db'])
 
 
 def get_etcd_client(config):
+    import etcd
     return etcd.Client(host=config['host'], port=config['port'])

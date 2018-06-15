@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 contName=$1
 docker stop ${contName};
 docker rm ${contName};
