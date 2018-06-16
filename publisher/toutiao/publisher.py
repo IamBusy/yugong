@@ -9,6 +9,7 @@
 @file: publisher.py
 @time: 15/06/2018 13:59
 """
+import requests
 from core import config, logger
 from bs4 import BeautifulSoup
 from entities import Article
