@@ -45,6 +45,7 @@ def publish_toutiao(event, context):
     from publisher.toutiao.publisher import ToutiaoPublisher
     from core import logger, config, db
     from entities import Article
+    import hashlib
 
     client = db.get_redis_client(config.get('app.redis'))
     published_key = 'published_articles'
@@ -60,10 +61,11 @@ def publish_toutiao(event, context):
             article = Article()
             article.rebuild(article_json)
             title = repr(article.title)
-            logger.info('Pre-publish article [%s]' % title)
-            if article and (not client.sismember(published_key, title)):
+            hashed_title = hashlib.md5(title.encode('utf8')).hexdigest().upper()
+            logger.info('Pre-publish article [%s] hash value [%s]' % (title, hashed_title))
+            if article and (not client.sismember(published_key, hash(title))):
                 publisher.publish(article)
-                client.sadd(published_key, title)
+                client.sadd(published_key, hashed_title)
             else:
                 logger.error('Pre-publish article [%s] error, due to published before' % title)
         except Exception as e:
@@ -74,4 +76,4 @@ def publish_toutiao(event, context):
 
 
 if __name__ == '__main__':
-    fetch(None, None)
+    publish_toutiao(None, None)
