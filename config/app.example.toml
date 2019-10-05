@@ -18,7 +18,13 @@ level="debug"
 #driver="stderr"
 driver = "file"
 
+# utc/local
+datetime_format="local"
 
+[redis]
+host="localhost"
+port=6379
+db=0
 
 [toutiao]
 account=""

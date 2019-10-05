@@ -26,10 +26,13 @@ __loggers = {}
 def __get_log_file():
     log_type = config.get('app.log.type')
     if log_type == 'daily':
-        return os.path.join(config.APP_PATH,
+        log_file = os.path.join(config.APP_PATH,
                             "storage/logs/" + config.get('app.name') + "-%s.log" % time.strftime('%Y-%m-%d', time.localtime()))
     else:
-        return os.path.join(config.APP_PATH, 'storage/logs/' + config.get('app.name') + '.log')
+        log_file = os.path.join(config.APP_PATH, 'storage/logs/' + config.get('app.name') + '.log')
+    if not os.path.exists(os.path.dirname(log_file)):
+        os.makedirs(os.path.dirname(log_file))
+    return log_file
 
 
 def __init():

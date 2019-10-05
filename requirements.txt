@@ -5,7 +5,6 @@ qiniu==7.2.0
 requests==2.18.4
 toml==0.9.4
 orator==0.9.7
-numpy==1.14.1
 pymongo==3.6.0
 beautifulsoup4==4.6.0
 jieba==0.39
